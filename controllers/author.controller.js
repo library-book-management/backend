@@ -17,20 +17,20 @@ const createAuthor = catchAsync(async (req, res) => {
   });
 
   if (fullMatch) {
-    throw new ApiError(httpStatus.CONFLICT, 'Tác giả đã tồn tại');
+    throw new ApiError(httpStatus.status.CONFLICT, 'Tác giả đã tồn tại');
   }
 
   if (normalizedEmail) {
     const emailUsed = await Author.findOne({ email: normalizedEmail });
     if (emailUsed) {
-      throw new ApiError(httpStatus.CONFLICT, 'Email này đã được sử dụng');
+      throw new ApiError(httpStatus.status.CONFLICT, 'Email này đã được sử dụng');
     }
   }
 
   if (normalizedPhone) {
     const phoneUsed = await Author.findOne({ phone: normalizedPhone });
     if (phoneUsed) {
-      throw new ApiError(httpStatus.CONFLICT, 'Số điện thoại này đã được sử dụng');
+      throw new ApiError(httpStatus.status.CONFLICT, 'Số điện thoại này đã được sử dụng');
     }
   }
 
@@ -40,8 +40,8 @@ const createAuthor = catchAsync(async (req, res) => {
     phone: normalizedPhone,
   });
 
-  res.status(httpStatus.CREATED).json({
-    code: httpStatus.CREATED,
+  res.status(httpStatus.status.CREATED).json({
+    code: httpStatus.status.CREATED,
     message: 'Tạo tác giả thành công!',
     data: { author: newAuthor },
   });
@@ -67,8 +67,8 @@ const getAuthors = catchAsync(async (req, res) => {
     Author.countDocuments(filter),
   ]);
 
-  res.status(httpStatus.OK).json({
-    code: httpStatus.OK,
+  res.status(httpStatus.status.OK).json({
+    code: httpStatus.status.OK,
     message: 'Lấy danh sách tác giả thành công!',
     data: {
       authors,
@@ -84,11 +84,11 @@ const getAuthorById = catchAsync(async (req, res) => {
   const author = await Author.findById(req.params.authorId);
 
   if (!author) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Không tìm thấy tác giả!');
+    throw new ApiError(httpStatus.status.NOT_FOUND, 'Không tìm thấy tác giả!');
   }
 
-  res.status(httpStatus.OK).json({
-    code: httpStatus.OK,
+  res.status(httpStatus.status.OK).json({
+    code: httpStatus.status.OK,
     message: 'Lấy thông tin tác giả thành công!',
     data: { author },
   });
@@ -100,7 +100,7 @@ const updateAuthorById = catchAsync(async (req, res) => {
 
   const author = await Author.findById(authorId);
   if (!author) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Không tìm thấy tác giả!');
+    throw new ApiError(httpStatus.status.NOT_FOUND, 'Không tìm thấy tác giả!');
   }
 
   const normalizedEmail = email?.trim().toLowerCase();
@@ -109,14 +109,14 @@ const updateAuthorById = catchAsync(async (req, res) => {
   if (normalizedEmail && normalizedEmail !== author.email) {
     const emailUsed = await Author.findOne({ email: normalizedEmail, _id: { $ne: authorId } });
     if (emailUsed) {
-      throw new ApiError(httpStatus.CONFLICT, 'Email này đã được sử dụng');
+      throw new ApiError(httpStatus.status.CONFLICT, 'Email này đã được sử dụng');
     }
   }
 
   if (normalizedPhone && normalizedPhone !== author.phone) {
     const phoneUsed = await Author.findOne({ phone: normalizedPhone, _id: { $ne: authorId } });
     if (phoneUsed) {
-      throw new ApiError(httpStatus.CONFLICT, 'Số điện thoại này đã được sử dụng');
+      throw new ApiError(httpStatus.status.CONFLICT, 'Số điện thoại này đã được sử dụng');
     }
   }
 
@@ -128,9 +128,9 @@ const updateAuthorById = catchAsync(async (req, res) => {
 
   await author.save();
 
-  res.status(httpStatus.OK).json({
+  res.status(httpStatus.status.OK).json({
     message: 'Cập nhật thông tin tác giả thành công!',
-    code: httpStatus.OK,
+    code: httpStatus.status.OK,
     data: { author },
   });
 });
@@ -140,14 +140,14 @@ const deleteAuthorById = catchAsync(async (req, res) => {
 
   const author = await Author.findById(authorId);
   if (!author) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Không tìm thấy tác giả!');
+    throw new ApiError(httpStatus.status.NOT_FOUND, 'Không tìm thấy tác giả!');
   }
 
   await Author.findByIdAndDelete(authorId);
 
-  res.status(httpStatus.OK).json({
+  res.status(httpStatus.status.OK).json({
     message: 'Xoá tác giả thành công!',
-    code: httpStatus.OK,
+    code: httpStatus.status.OK,
     data: { author },
   });
 });

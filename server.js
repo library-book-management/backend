@@ -26,23 +26,23 @@ mongoose.set('debug', devEnv);
 app.use('/api/v1', apiRoute);
 
 app.get('/', (req, res) => {
-  res.status(httpStatus.OK).send({
+  res.status(httpStatus.status.OK).send({
     message: 'Server is running 🍀',
-    code: httpStatus.OK,
+    code: httpStatus.status.OK,
   });
 });
 
 app.get('/health-check', (req, res) => {
-  res.status(httpStatus.OK).send({
+  res.status(httpStatus.status).send({
     message: 'OK',
-    code: httpStatus.OK,
+    code: httpStatus.status.OK,
   });
 });
 
-app.all('/{*any}', (req, res) => {
-  res.status(httpStatus.NOT_FOUND).send({
+app.use((req, res, next) => {
+  res.status(httpStatus.status.NOT_FOUND).send({
     message: 'Not found',
-    code: httpStatus.NOT_FOUND,
+    code: httpStatus.status.NOT_FOUND,
   });
 });
 

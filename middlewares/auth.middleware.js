@@ -9,18 +9,18 @@ const auth = catchAsync(async (req, res, next) => {
   const token = extracToken(req);
 
   if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Vui lòng đăng nhập hệ thống');
+    throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Vui lòng đăng nhập hệ thống');
   }
 
   const payload = jwt.verify(token, process.env.JWT_ACCESS_TOKEN_SECRET);
 
   const user = await User.findById(payload.id);
   if (!user) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Vui lòng đăng nhập hệ thống');
+    throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Vui lòng đăng nhập hệ thống');
   }
 
   if (user.isLocked) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Tài khoản đã bị khoá');
+    throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Tài khoản đã bị khoá');
   }
 
   req.user = user;
@@ -31,7 +31,7 @@ const auth = catchAsync(async (req, res, next) => {
 const author = (rolesAllowed) =>
   catchAsync(async (req, res, next) => {
     if (!rolesAllowed.includes(req.user.role)) {
-      throw new ApiError(httpStatus.FORBIDDEN, 'Bạn không có quyền truy cập');
+      throw new ApiError(httpStatus.status.FORBIDDEN, 'Bạn không có quyền truy cập');
     }
     next();
   });

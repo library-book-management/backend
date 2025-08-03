@@ -2,7 +2,9 @@ const httpStatus = require('http-status');
 
 const errorHandler = (error, req, res, next) => {
   let message = error.message || 'Internal server error';
-  let code = error.status || httpStatus.INTERNAL_SERVER_ERROR;
+  
+  let code = Number.isInteger(error.status) ? error.status : httpStatus.status.INTERNAL_SERVER_ERROR;
+
   switch (message) {
     case 'File too large':
       message = 'File quá lớn';
@@ -14,10 +16,8 @@ const errorHandler = (error, req, res, next) => {
       code = httpStatus.UNAUTHORIZED;
       break;
   }
-  res.status(code).json({
-    message,
-    code,
-  });
+
+  res.status(code).json({ message, code });
 };
 
 module.exports = errorHandler;

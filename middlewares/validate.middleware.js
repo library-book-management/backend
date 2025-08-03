@@ -12,9 +12,9 @@ const validate = (schema) => (req, res, next) => {
         .join(',')
         .replace(/"/g, '');
 
-      return res.status(httpStatus.BAD_REQUEST).json({
+      return res.status(httpStatus.status.BAD_REQUEST).json({
         message: messages,
-        code: httpStatus.BAD_REQUEST,
+        code: httpStatus.status.BAD_REQUEST,
       });
     }
   }
