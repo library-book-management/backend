@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const httpStatus = require('http-status');
 const User = require('../models/user.model');
-const ApiError = require('../utils/ApiError');
-const catchAsync = require('../utils/catchAsync');
+const catchAsync = require('../utils/catch-async');
+const ApiError = require('../utils/api-error');
 
 const auth = catchAsync(async (req, res, next) => {
   const token = extracToken(req);
