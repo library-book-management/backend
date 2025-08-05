@@ -68,6 +68,8 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
+  console.log(req);
+
   const { email, password } = req.body;
 
   const account = await User.findOne({ email });
@@ -76,7 +78,7 @@ const login = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.status.NOT_FOUND, 'Tài khoản không tồn tại');
   }
 
-  const isValidPassword = await account.comparePassword(password);
+  const isValidPassword = await bcrypt.compare(password, account.password);
 
   if (!isValidPassword) {
     throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Mật khẩu không chính xác');
@@ -110,8 +112,7 @@ const login = catchAsync(async (req, res) => {
     code: httpStatus.status.OK,
     message: 'Đăng nhập thành công',
     data: {
-      accessToken,
-      refreshToken,
+      users: payload,
     },
   });
 });
