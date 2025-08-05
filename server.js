@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
 
 const cors = require('cors');
 const http = require('http');
@@ -47,7 +47,6 @@ app.use((req, res, next) => {
 });
 
 app.use(errorHandler);
-
 
 mongoose
   .connect(mongoURI)

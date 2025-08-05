@@ -7,6 +7,10 @@ const listRoutesApi = [
     path: '/authors',
     route: require('./author.route'),
   },
+  {
+    path: '/categories',
+    route: require('./category.route'),
+  },
 ];
 
 listRoutesApi.forEach((route) => {
