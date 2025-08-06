@@ -2,7 +2,8 @@ const Joi = require('joi');
 
 const auth = {
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(100).required(),
+    address: Joi.string(),
+    name: Joi.string().min(2).max(100),
     email: Joi.string().required().messages({
       'string.email': 'Email không hợp lệ',
     }),
