@@ -3,7 +3,6 @@ const USER_ROLE_ENUM = {
   ADMIN: 'admin',
 };
 
-
 module.exports = {
   USER_ROLE_ENUM,
 };

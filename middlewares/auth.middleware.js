@@ -5,7 +5,7 @@ const User = require('../models/user.model');
 const catchAsync = require('../utils/catch-async');
 const ApiError = require('../utils/api-error');
 const { USER_ROLE_ENUM } = require('../constants');
-require("../constants")
+require('../constants');
 
 const auth = catchAsync(async (req, res, next) => {
   const token = extracToken(req);
@@ -21,8 +21,11 @@ const auth = catchAsync(async (req, res, next) => {
     throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Vui lòng đăng nhập hệ thống');
   }
 
-  if(USER_ROLE_ENUM.ADMIN !== user.role) {
-    throw new ApiError(httpStatus.status.UNAUTHORIZED, 'Tài khoản không có quyền truy cập hệ thống');
+  if (USER_ROLE_ENUM.ADMIN !== user.role) {
+    throw new ApiError(
+      httpStatus.status.UNAUTHORIZED,
+      'Tài khoản không có quyền truy cập hệ thống',
+    );
   }
 
   if (user.isLocked) {
