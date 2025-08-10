@@ -9,6 +9,7 @@ const { auth, author } = require('../middlewares/auth.middleware');
 const { USER_ROLE_ENUM } = require('../constants');
 
 router
+  .post('/', auth, author(USER_ROLE_ENUM.ADMIN), userController.createUser)
   .get('/', auth, author(USER_ROLE_ENUM.ADMIN), userController.getUserByConditions)
   .get('/:userId', auth, author(USER_ROLE_ENUM.ADMIN), userController.getUserById)
   .put('/:userId', auth, author(USER_ROLE_ENUM.ADMIN), userController.updateUserById)
