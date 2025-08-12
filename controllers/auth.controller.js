@@ -41,18 +41,18 @@ const register = catchAsync(async (req, res) => {
   const refreshToken = generateToken.generateRefreshToken(payload);
 
   res.status(httpStatus.status.CREATED).json({
-    code: httpStatus.status.CREATED,
-    message: 'Đăng ký thành công',
     data: {
+      code: httpStatus.status.CREATED,
+      message: 'Đăng ký thành công',
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
       },
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     },
-    accessToken: accessToken,
-    refreshToken: refreshToken,
   });
 });
 
@@ -84,13 +84,13 @@ const login = catchAsync(async (req, res) => {
   const refreshToken = generateToken.generateRefreshToken(payload);
 
   res.status(httpStatus.status.OK).json({
-    code: httpStatus.status.OK,
-    message: 'Đăng nhập thành công',
     data: {
+      code: httpStatus.status.OK,
+      message: 'Đăng nhập thành công',
       users: payload,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     },
-    accessToken: accessToken,
-    refreshToken: refreshToken,
   });
 });
 
