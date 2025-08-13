@@ -40,29 +40,18 @@ const register = catchAsync(async (req, res) => {
   const accessToken = generateToken.generateAccessToken(payload);
   const refreshToken = generateToken.generateRefreshToken(payload);
 
-  // Gán cookie
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
   res.status(httpStatus.status.CREATED).json({
-    code: httpStatus.status.CREATED,
-    message: 'Đăng ký thành công',
     data: {
+      code: httpStatus.status.CREATED,
+      message: 'Đăng ký thành công',
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
       },
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     },
   });
 });
@@ -94,25 +83,13 @@ const login = catchAsync(async (req, res) => {
   const accessToken = generateToken.generateAccessToken(payload);
   const refreshToken = generateToken.generateRefreshToken(payload);
 
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    // secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    // secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
   res.status(httpStatus.status.OK).json({
-    code: httpStatus.status.OK,
-    message: 'Đăng nhập thành công',
     data: {
+      code: httpStatus.status.OK,
+      message: 'Đăng nhập thành công',
       users: payload,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     },
   });
 });
