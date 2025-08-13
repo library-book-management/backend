@@ -12,8 +12,13 @@ exports.getAllBooks = async (req, res) => {
     // Đếm tổng số kết quả
     const totalResults = await Book.countDocuments();
 
-    // Lấy danh sách sách với phân trang
-    const books = await Book.find().skip(skip).limit(limit);
+    // Lấy danh sách sách với phân trang và populate các trường liên quan
+    const books = await Book.find()
+      .skip(skip)
+      .limit(limit)
+      .populate('author_id', 'name')
+      .populate('category_id', 'name');
+    // .populate('publisher_id', 'name');
 
     res.status(httpStatus.status.OK).json({
       code: httpStatus.status.OK,
@@ -37,7 +42,10 @@ exports.getAllBooks = async (req, res) => {
 // Get a single book by ID
 exports.getBookById = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.bookId);
+    const book = await Book.findById(req.params.bookId)
+      .populate('author_id', 'name')
+      .populate('category_id', 'name');
+    // .populate('publisher_id', 'name');
     if (!book) {
       return res.status(httpStatus.status.NOT_FOUND).json({
         code: httpStatus.status.NOT_FOUND,
