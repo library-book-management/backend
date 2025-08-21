@@ -57,7 +57,6 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-  console.log(req);
 
   const { email, password } = req.body;
 
