@@ -10,7 +10,8 @@ exports.getAllBooks = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const search = req.query.search;
-    const filter = {};
+    let books = [];
+    let totalResults = 0;
 
     // Nếu có search, dùng aggregate để tìm theo title, author.name, publisher.name, category.name
     if (search) {
@@ -20,7 +21,7 @@ exports.getAllBooks = async (req, res) => {
             from: 'authors',
             localField: 'author_id',
             foreignField: '_id',
-            as: 'author',
+            as: 'author_populated',
           },
         },
         {
@@ -28,7 +29,7 @@ exports.getAllBooks = async (req, res) => {
             from: 'publishers',
             localField: 'publisher_id',
             foreignField: '_id',
-            as: 'publisher',
+            as: 'publisher_populated',
           },
         },
         {
@@ -36,17 +37,58 @@ exports.getAllBooks = async (req, res) => {
             from: 'categories',
             localField: 'category_id',
             foreignField: '_id',
-            as: 'category',
+            as: 'category_populated',
           },
         },
         {
           $match: {
             $or: [
               { title: { $regex: search, $options: 'i' } },
-              { 'author.name': { $regex: search, $options: 'i' } },
-              { 'publisher.name': { $regex: search, $options: 'i' } },
-              { 'category.name': { $regex: search, $options: 'i' } },
+              { 'author_populated.name': { $regex: search, $options: 'i' } },
+              { 'publisher_populated.name': { $regex: search, $options: 'i' } },
+              { 'category_populated.name': { $regex: search, $options: 'i' } },
             ],
+          },
+        },
+        {
+          $addFields: {
+            author_id: {
+              $map: {
+                input: '$author_populated',
+                as: 'author',
+                in: {
+                  _id: '$$author._id',
+                  name: '$$author.name',
+                },
+              },
+            },
+            category_id: {
+              $map: {
+                input: '$category_populated',
+                as: 'category',
+                in: {
+                  _id: '$$category._id',
+                  name: '$$category.name',
+                },
+              },
+            },
+            publisher_id: {
+              $map: {
+                input: '$publisher_populated',
+                as: 'publisher',
+                in: {
+                  _id: '$$publisher._id',
+                  name: '$$publisher.name',
+                },
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            author_populated: 0,
+            publisher_populated: 0,
+            category_populated: 0,
           },
         },
         { $skip: skip },
@@ -57,35 +99,91 @@ exports.getAllBooks = async (req, res) => {
       const countPipeline = pipeline.slice(0, -2); // bỏ skip, limit
       countPipeline.push({ $count: 'totalResults' });
       const countResult = await Book.aggregate(countPipeline);
-      const totalResults = countResult[0]?.totalResults || 0;
+      totalResults = countResult[0]?.totalResults || 0;
 
       // Lấy danh sách sách với phân trang
-      const books = await Book.aggregate(pipeline);
-
-      // Populate lại các trường author_id, category_id cho đồng nhất
-      // (Nếu cần populate thêm trường, có thể dùng mongoose-populate sau khi lấy id)
-      res.status(httpStatus.status.OK).json({
-        code: httpStatus.status.OK,
-        message: 'Lấy danh sách sách thành công!',
-        data: {
-          books,
-          limit: +limit,
-          currentPage: +page,
-          totalPage: Math.ceil(totalResults / +limit),
-          totalResults,
+      books = await Book.aggregate(pipeline);
+    } else {
+      // Nếu không có search, dùng aggregate để đồng nhất cấu trúc
+      const pipeline = [
+        {
+          $lookup: {
+            from: 'authors',
+            localField: 'author_id',
+            foreignField: '_id',
+            as: 'author_populated',
+          },
         },
-      });
-      return;
-    }
+        {
+          $lookup: {
+            from: 'publishers',
+            localField: 'publisher_id',
+            foreignField: '_id',
+            as: 'publisher_populated',
+          },
+        },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category_id',
+            foreignField: '_id',
+            as: 'category_populated',
+          },
+        },
+        {
+          $addFields: {
+            author_id: {
+              $map: {
+                input: '$author_populated',
+                as: 'author',
+                in: {
+                  _id: '$$author._id',
+                  name: '$$author.name',
+                },
+              },
+            },
+            category_id: {
+              $map: {
+                input: '$category_populated',
+                as: 'category',
+                in: {
+                  _id: '$$category._id',
+                  name: '$$category.name',
+                },
+              },
+            },
+            publisher_id: {
+              $map: {
+                input: '$publisher_populated',
+                as: 'publisher',
+                in: {
+                  _id: '$$publisher._id',
+                  name: '$$publisher.name',
+                },
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            author_populated: 0,
+            publisher_populated: 0,
+            category_populated: 0,
+          },
+        },
+        { $skip: skip },
+        { $limit: limit },
+      ];
 
-    // Nếu không có search, dùng cách cũ
-    const totalResults = await Book.countDocuments(filter);
-    const books = await Book.find(filter)
-      .skip(skip)
-      .limit(limit)
-      .populate('author_id', 'name')
-      .populate('category_id', 'name')
-      .populate('publisher_id', 'name');
+      // Đếm tổng số kết quả
+      const countPipeline = pipeline.slice(0, -2); // bỏ skip, limit
+      countPipeline.push({ $count: 'totalResults' });
+      const countResult = await Book.aggregate(countPipeline);
+      totalResults = countResult[0]?.totalResults || 0;
+
+      // Lấy danh sách sách với phân trang
+      books = await Book.aggregate(pipeline);
+    }
 
     res.status(httpStatus.status.OK).json({
       code: httpStatus.status.OK,
